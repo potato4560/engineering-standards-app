@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Download, Eye, Filter, X, FileText, Building2, MapPin, Tag, Plus, Edit2, Trash2, ExternalLink, Save, Upload, FileUp, RefreshCw, LogOut, LogIn } from 'lucide-react';
+import { Search, Download, Eye, Filter, X, FileText, Building2, MapPin, Tag, Plus, Edit2, Trash2, ExternalLink, Save, Upload, FileUp, RefreshCw, LogOut, LogIn, BookOpen, Code } from 'lucide-react';
 
 // Supabase configuration
 const SUPABASE_URL = 'https://djxamnmqtcymejoquvav.supabase.co';
@@ -29,19 +29,25 @@ const supabaseRequest = async (endpoint, options = {}) => {
 };
 
 const EngineeringStandardsApp = () => {
+  const [currentPage, setCurrentPage] = useState('standards'); // 'standards' or 'macros'
   const [standards, setStandards] = useState([]);
+  const [macros, setMacros] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [macroSearchTerm, setMacroSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState('VIC');
   const [selectedAuthorities, setSelectedAuthorities] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('Active');
+  const [selectedMacroStatus, setSelectedMacroStatus] = useState('All');
   const [showFilters, setShowFilters] = useState(true);
   const [viewingStandard, setViewingStandard] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddMacroForm, setShowAddMacroForm] = useState(false);
   const [showBulkImport, setShowBulkImport] = useState(false);
   const [editingStandard, setEditingStandard] = useState(null);
+  const [editingMacro, setEditingMacro] = useState(null);
   const [bulkImportText, setBulkImportText] = useState('');
   const [importPreview, setImportPreview] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -60,6 +66,14 @@ const EngineeringStandardsApp = () => {
     effectiveDate: '',
     status: 'Active',
     externalUrl: ''
+  });
+
+  const [macroFormData, setMacroFormData] = useState({
+    name: '',
+    fileName: '',
+    description: '',
+    status: 'documented',
+    videoUrl: ''
   });
 
   // Check if user is logged in and load saved credentials
@@ -139,8 +153,30 @@ const EngineeringStandardsApp = () => {
     }
   };
 
+  const loadMacros = async () => {
+    try {
+      const data = await supabaseRequest('macros?select=*&order=created_at.desc');
+      
+      const formattedData = data.map(item => ({
+        id: item.id,
+        name: item.name,
+        fileName: item.file_name,
+        description: item.description,
+        status: item.status,
+        videoUrl: item.video_url
+      }));
+      
+      setMacros(formattedData);
+    } catch (error) {
+      console.error('Error loading macros:', error);
+      // If table doesn't exist yet, initialize with default data
+      setMacros([]);
+    }
+  };
+
   useEffect(() => {
     loadStandards();
+    loadMacros();
   }, []);
 
   const states = useMemo(() => {
@@ -180,6 +216,20 @@ const EngineeringStandardsApp = () => {
       return matchesSearch && matchesState && matchesAuthority && matchesCategory && matchesStatus;
     });
   }, [standards, searchTerm, selectedState, selectedAuthorities, selectedCategories, selectedStatus]);
+
+  const filteredMacros = useMemo(() => {
+    return macros.filter(macro => {
+      const matchesSearch = macroSearchTerm === '' || 
+        macro.name.toLowerCase().includes(macroSearchTerm.toLowerCase()) ||
+        macro.description.toLowerCase().includes(macroSearchTerm.toLowerCase()) ||
+        macro.fileName.toLowerCase().includes(macroSearchTerm.toLowerCase());
+      
+      const matchesStatus = selectedMacroStatus === 'All' || 
+        macro.status === selectedMacroStatus;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [macros, macroSearchTerm, selectedMacroStatus]);
 
   const getStateBadgeColor = (state) => {
     const colors = {
@@ -283,6 +333,86 @@ const EngineeringStandardsApp = () => {
     } catch (error) {
       console.error('Error deleting standard:', error);
       alert('Error deleting standard. Please try again.');
+    }
+  };
+
+  // Macro management functions
+  const handleAddMacro = async () => {
+    try {
+      const newMacro = {
+        name: macroFormData.name,
+        file_name: macroFormData.fileName,
+        description: macroFormData.description,
+        status: macroFormData.status,
+        video_url: macroFormData.videoUrl || null
+      };
+
+      await supabaseRequest('macros', {
+        method: 'POST',
+        body: JSON.stringify(newMacro)
+      });
+
+      await loadMacros();
+      setShowAddMacroForm(false);
+      setMacroFormData({
+        name: '',
+        fileName: '',
+        description: '',
+        status: 'documented',
+        videoUrl: ''
+      });
+      alert('Macro added successfully!');
+    } catch (error) {
+      console.error('Error adding macro:', error);
+      alert('Error adding macro. Please try again.');
+    }
+  };
+
+  const handleUpdateMacro = async () => {
+    try {
+      const updatedMacro = {
+        name: macroFormData.name,
+        file_name: macroFormData.fileName,
+        description: macroFormData.description,
+        status: macroFormData.status,
+        video_url: macroFormData.videoUrl || null
+      };
+
+      await supabaseRequest(`macros?id=eq.${editingMacro.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updatedMacro)
+      });
+
+      await loadMacros();
+      setShowAddMacroForm(false);
+      setEditingMacro(null);
+      setMacroFormData({
+        name: '',
+        fileName: '',
+        description: '',
+        status: 'documented',
+        videoUrl: ''
+      });
+      alert('Macro updated successfully!');
+    } catch (error) {
+      console.error('Error updating macro:', error);
+      alert('Error updating macro. Please try again.');
+    }
+  };
+
+  const handleDeleteMacro = async (id) => {
+    if (!window.confirm('Delete this macro?')) return;
+
+    try {
+      await supabaseRequest(`macros?id=eq.${id}`, {
+        method: 'DELETE'
+      });
+
+      await loadMacros();
+      alert('Macro deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting macro:', error);
+      alert('Error deleting macro. Please try again.');
     }
   };
 
@@ -599,13 +729,40 @@ const EngineeringStandardsApp = () => {
                   <p className="text-xs text-gray-400">Engineering Standards Library</p>
                 </div>
               </div>
+              
+              {/* Navigation Tabs */}
+              <nav className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage('standards')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === 'standards' 
+                      ? 'bg-orange-600 text-white' 
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Standards
+                </button>
+                <button
+                  onClick={() => setCurrentPage('macros')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === 'macros' 
+                      ? 'bg-orange-600 text-white' 
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  <Code className="w-4 h-4" />
+                  Macros
+                </button>
+              </nav>
+
               <span className="px-2 py-1 text-xs font-medium rounded bg-green-900 text-green-300">
                 ☁️ Cloud Synced
               </span>
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={loadStandards}
+                onClick={currentPage === 'standards' ? loadStandards : loadMacros}
                 className="flex items-center gap-2 px-3 py-2 text-gray-300 hover:bg-gray-700 rounded-lg"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -640,53 +797,57 @@ const EngineeringStandardsApp = () => {
                 </button>
               )}
               
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-gray-400" />
-                <select
-                  value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
-                  className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                >
-                  {states.map(state => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
-                </select>
-              </div>
+              {currentPage === 'standards' && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-gray-400" />
+                  <select
+                    value={selectedState}
+                    onChange={(e) => setSelectedState(e.target.value)}
+                    className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  >
+                    {states.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           </div>
           
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search standards..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
+          {currentPage === 'standards' ? (
+            <>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search standards..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
 
-          {showAdmin && isAuthenticated && (
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={() => {
-                  setEditingStandard(null);
-                  setFormData({
-                    title: '',
-                    description: '',
-                    authority: '',
-                    state: 'VIC',
-                    category: '',
-                    version: '',
-                    effectiveDate: '',
-                    status: 'Active',
-                    externalUrl: ''
-                  });
-                  setShowAddForm(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                <Plus className="w-4 h-4" />
+              {showAdmin && isAuthenticated && (
+                <div className="mt-4 flex gap-3">
+                  <button
+                    onClick={() => {
+                      setEditingStandard(null);
+                      setFormData({
+                        title: '',
+                        description: '',
+                        authority: '',
+                        state: 'VIC',
+                        category: '',
+                        version: '',
+                        effectiveDate: '',
+                        status: 'Active',
+                        externalUrl: ''
+                      });
+                      setShowAddForm(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                    <Plus className="w-4 h-4" />
                 Add Standard
               </button>
               
@@ -706,6 +867,56 @@ const EngineeringStandardsApp = () => {
                 Export CSV
               </button>
             </div>
+          )}
+            </>
+          ) : (
+            <>
+              <div className="mb-4 flex gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      placeholder="Search macros..."
+                      value={macroSearchTerm}
+                      onChange={(e) => setMacroSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+                </div>
+                <select
+                  value={selectedMacroStatus}
+                  onChange={(e) => setSelectedMacroStatus(e.target.value)}
+                  className="px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                >
+                  <option value="All">All Status</option>
+                  <option value="documented">Documented</option>
+                  <option value="pending">Not Working</option>
+                </select>
+              </div>
+
+              {showAdmin && isAuthenticated && (
+                <div className="mt-4 flex gap-3">
+                  <button
+                    onClick={() => {
+                      setEditingMacro(null);
+                      setMacroFormData({
+                        name: '',
+                        fileName: '',
+                        description: '',
+                        status: 'documented',
+                        videoUrl: ''
+                      });
+                      setShowAddMacroForm(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Macro
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </header>
@@ -844,24 +1055,25 @@ const EngineeringStandardsApp = () => {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          {showFilters && (
-            <aside className="w-64 flex-shrink-0">
-              <div className="bg-gray-800 rounded-lg shadow-sm p-4 sticky top-24 border border-gray-700">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-white flex items-center gap-2">
-                    <Filter className="w-4 h-4" />
-                    Filters
-                  </h2>
-                </div>
+      {currentPage === 'standards' ? (
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex gap-6">
+            {showFilters && (
+              <aside className="w-64 flex-shrink-0">
+                <div className="bg-gray-800 rounded-lg shadow-sm p-4 sticky top-24 border border-gray-700">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-semibold text-white flex items-center gap-2">
+                      <Filter className="w-4 h-4" />
+                      Filters
+                    </h2>
+                  </div>
 
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium text-gray-300 mb-2">Status</h3>
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Status</h3>
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
                   >
                     <option value="All">All</option>
                     <option value="Active">Active</option>
@@ -1032,6 +1244,248 @@ const EngineeringStandardsApp = () => {
           </main>
         </div>
       </div>
+      ) : (
+        /* Macros Page */
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-white mb-2">12d Model Macros Documentation</h2>
+            <p className="text-gray-400">Comprehensive guide to available 12d Model macros and tools</p>
+          </div>
+
+          {macros.length > 0 && (
+            <div className="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+              <h3 className="text-xl font-semibold text-white mb-4">Table of Contents</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {macros.map(macro => (
+                  <a
+                    key={macro.id}
+                    href={`#macro-${macro.id}`}
+                    className="text-orange-400 hover:text-orange-300 hover:underline transition-colors"
+                  >
+                    {macro.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mb-4">
+            <p className="text-sm text-gray-400">
+              Showing {filteredMacros.length} of {macros.length} macros
+            </p>
+          </div>
+
+          {filteredMacros.length === 0 ? (
+            <div className="bg-gray-800 rounded-lg shadow-sm p-12 text-center border border-gray-700">
+              <Code className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">No macros found</h3>
+              <p className="text-gray-400 mb-4">
+                {macros.length === 0 
+                  ? "Get started by adding your first macro!" 
+                  : "Try adjusting your search term or filters"}
+              </p>
+              {showAdmin && macros.length === 0 && isAuthenticated && (
+                <button
+                  onClick={() => {
+                    setEditingMacro(null);
+                    setMacroFormData({
+                      name: '',
+                      fileName: '',
+                      description: '',
+                      status: 'documented',
+                      videoUrl: ''
+                    });
+                    setShowAddMacroForm(true);
+                  }}
+                  className="mt-4 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+                >
+                  Add First Macro
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {filteredMacros.map(macro => (
+                <div
+                  key={macro.id}
+                  id={`macro-${macro.id}`}
+                  className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-orange-600 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-semibold text-white mb-2">{macro.name}</h3>
+                      <p className="text-sm text-gray-400 font-mono">{macro.fileName}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        macro.status === 'documented' 
+                          ? 'bg-green-900 text-green-300' 
+                          : 'bg-orange-900 text-orange-300'
+                      }`}>
+                        {macro.status === 'documented' ? 'Documented' : 'Not Working'}
+                      </span>
+                      
+                      {showAdmin && isAuthenticated && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingMacro(macro);
+                              setMacroFormData({
+                                name: macro.name,
+                                fileName: macro.fileName,
+                                description: macro.description,
+                                status: macro.status,
+                                videoUrl: macro.videoUrl || ''
+                              });
+                              setShowAddMacroForm(true);
+                            }}
+                            className="p-2 bg-yellow-900 text-yellow-300 rounded-lg hover:bg-yellow-800"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMacro(macro.id)}
+                            className="p-2 bg-red-900 text-red-300 rounded-lg hover:bg-red-800"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-gray-300 mb-4 leading-relaxed">
+                    <strong className="text-white">Description:</strong> {macro.description}
+                  </p>
+
+                  {macro.videoUrl ? (
+                    <a
+                      href={macro.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 inline-flex"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Watch Video Tutorial
+                    </a>
+                  ) : (
+                    <button
+                      disabled
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-400 rounded-lg cursor-not-allowed"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Video Tutorial (Coming Soon)
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Macro Add/Edit Form Modal */}
+      {showAddMacroForm && (
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-gray-800 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="p-6 border-b border-gray-700 sticky top-0 bg-gray-800">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">
+                  {editingMacro ? 'Edit Macro' : 'Add New Macro'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowAddMacroForm(false);
+                    setEditingMacro(null);
+                  }}
+                  className="p-2 text-gray-400 hover:text-white"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Macro Name</label>
+                <input
+                  type="text"
+                  value={macroFormData.name}
+                  onChange={(e) => setMacroFormData({...macroFormData, name: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  placeholder="e.g., Attribute Label"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">File Name</label>
+                <input
+                  type="text"
+                  value={macroFormData.fileName}
+                  onChange={(e) => setMacroFormData({...macroFormData, fileName: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white font-mono"
+                  placeholder="e.g., Attribute_Label.4do"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
+                <textarea
+                  value={macroFormData.description}
+                  onChange={(e) => setMacroFormData({...macroFormData, description: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  rows="4"
+                  placeholder="Describe what this macro does and how to use it..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                <select
+                  value={macroFormData.status}
+                  onChange={(e) => setMacroFormData({...macroFormData, status: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                >
+                  <option value="documented">Documented</option>
+                  <option value="pending">Not Working</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Video Tutorial URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={macroFormData.videoUrl}
+                  onChange={(e) => setMacroFormData({...macroFormData, videoUrl: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-700 flex gap-3 justify-end bg-gray-750">
+              <button
+                onClick={() => {
+                  setShowAddMacroForm(false);
+                  setEditingMacro(null);
+                }}
+                className="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={editingMacro ? handleUpdateMacro : handleAddMacro}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+              >
+                <Save className="w-4 h-4" />
+                {editingMacro ? 'Update' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
