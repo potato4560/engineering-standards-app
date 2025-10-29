@@ -114,23 +114,74 @@ const EngineeringStandardsApp = () => {
 
   // Meeting form state for the new UI
   const [meetingForm, setMeetingForm] = useState({
-    employeeName: '',
-    managerName: '',
-    meetingDate: '',
-    nextMeetingDate: '',
-    performanceRating: '',
-    achievements: '',
-    goalsProgress: '',
-    newGoals: '',
-    challenges: '',
-    supportNeeded: '',
-    trainingNeeds: '',
-    employeeFeedback: '',
-    managerFeedback: '',
-    communicationPreferences: '',
-    employeeActions: '',
-    managerActions: '',
-    additionalNotes: ''
+    employeeName: 'Design Team Member',
+    managerName: 'Engineering Manager',
+    meetingDate: '2025-10-30',
+    nextMeetingDate: '2025-11-06',
+    performanceRating: 'Exceeds Expectations',
+    achievements: `Strong performance across all metrics in October:
+• Design Projects: Achieved 100% of goals (3/3 active projects maintained)
+• Task Completion: 94.68% completion rate (89 of 94 tasks completed)
+• Bone Projects: Delivered 18 active projects with 78.95% completion rate
+• Efficiency: Significantly under estimated hours (162 actual vs 206 estimated for design, 59 vs 119 for bones)`,
+    goalsProgress: `October 2025 Performance Summary:
+Design Jobs:
+- Active Projects: 3/3 (100% of target)
+- Tasks Created: 94 total
+- Tasks Completed: 89 (94.68% completion)
+- Hours: 162 actual vs 206 estimated (21% under budget)
+
+Bone Jobs:
+- Active Projects: 18 delivered
+- Total Bones: 38 created, 30 finished
+- Completion Rate: 78.95%
+- Hours: 59 actual vs 119 estimated (50% efficiency gain)`,
+    newGoals: `November 2025 Goals:
+• Maintain 100% project delivery rate for design jobs
+• Improve bone job completion rate from 78.95% to 85%
+• Continue efficient hour management (stay within estimated hours)
+• Target 3-4 active design projects for November
+• Focus on completing remaining 8 bone projects from current pipeline`,
+    challenges: `Current Challenges:
+• Bone job completion rate at 78.95% - need to identify bottlenecks
+• 8 bone projects still in progress from October pipeline
+• Balancing design task completion with bone project delivery
+• Resource allocation between design (94.68% completion) and bone work`,
+    supportNeeded: `Support Requirements:
+• Review bone project workflow to improve completion rate
+• Additional resources or process optimization for bone jobs
+• Clarification on priority between design tasks vs bone projects
+• Training on time estimation accuracy (currently performing well under estimates)`,
+    trainingNeeds: `Development Opportunities:
+• Project management techniques for bone job workflow
+• Advanced design task prioritization methods
+• Cross-training to improve versatility between design and bone work
+• Efficiency optimization workshops`,
+    employeeFeedback: `Very satisfied with design project performance - consistently meeting targets and staying under hour estimates. 
+
+Concerned about bone job completion rate (78.95%) - would like support to identify what's causing delays in finishing projects. 
+
+Happy with current workload balance and appreciate the consistent project flow.`,
+    managerFeedback: `Excellent performance overall. The efficiency gains are remarkable - 21% under estimate on design hours and 50% under on bone hours while maintaining quality.
+
+The 100% achievement on design goals is outstanding. Need to address the bone job completion rate - let's identify if it's process, resource, or prioritization related.
+
+Strong contributor who consistently delivers results.`,
+    communicationPreferences: 'Weekly check-ins, immediate escalation for blockers, monthly metrics review',
+    employeeActions: `1. Analyze bone job workflow to identify completion bottlenecks
+2. Create process improvement plan for remaining 8 bone projects
+3. Document successful design job practices for team sharing
+4. Set weekly bone completion targets for November`,
+    managerActions: `1. Review bone job resource allocation and dependencies
+2. Investigate process improvements for bone project workflow
+3. Provide additional support/training for bone job completion
+4. Schedule mid-month check-in on November goal progress`,
+    additionalNotes: `High performer with excellent efficiency metrics. Focus area for improvement is bone job completion rate while maintaining current design excellence.
+
+October Metrics Summary:
+- Design: 100% goal achievement, 94.68% task completion
+- Bone: 78.95% completion rate, excellent hour efficiency
+- Overall: Strong contributor exceeding hour efficiency expectations`
   });
 
   // Check if user is logged in and load saved credentials
