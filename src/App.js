@@ -109,7 +109,29 @@ const EngineeringStandardsApp = () => {
 
   const [savedMeetings, setSavedMeetings] = useState([]);
   const [showMeetingHistory, setShowMeetingHistory] = useState(false);
+  const [showSavedMeetings, setShowSavedMeetings] = useState(false);
   const [viewingMeeting, setViewingMeeting] = useState(null);
+
+  // Meeting form state for the new UI
+  const [meetingForm, setMeetingForm] = useState({
+    employeeName: '',
+    managerName: '',
+    meetingDate: '',
+    nextMeetingDate: '',
+    performanceRating: '',
+    achievements: '',
+    goalsProgress: '',
+    newGoals: '',
+    challenges: '',
+    supportNeeded: '',
+    trainingNeeds: '',
+    employeeFeedback: '',
+    managerFeedback: '',
+    communicationPreferences: '',
+    employeeActions: '',
+    managerActions: '',
+    additionalNotes: ''
+  });
 
   // Check if user is logged in and load saved credentials
   useEffect(() => {
@@ -245,17 +267,17 @@ const EngineeringStandardsApp = () => {
   };
 
   const saveMeetingForm = () => {
-    if (!meetingFormData.participant.trim()) {
-      alert('Please enter a participant name before saving.');
+    if (!meetingForm.employeeName.trim()) {
+      alert('Please enter an employee name before saving.');
       return;
     }
 
     const now = new Date();
     const timestamp = now.toISOString().split('T')[0] + '_' + now.getTime();
-    const storageKey = `meeting_${meetingFormData.participant.replace(/\s+/g, '_')}_${timestamp}`;
+    const storageKey = `meeting_${meetingForm.employeeName.replace(/\s+/g, '_')}_${timestamp}`;
     
     const meetingData = {
-      ...meetingFormData,
+      ...meetingForm,
       savedAt: now.toISOString(),
       id: storageKey
     };
@@ -263,7 +285,7 @@ const EngineeringStandardsApp = () => {
     localStorage.setItem(storageKey, JSON.stringify(meetingData));
     loadSavedMeetings();
     
-    alert(`✅ Meeting notes saved for ${meetingFormData.participant}!\n\nView saved meetings in the history section.`);
+    alert(`✅ Meeting notes saved for ${meetingForm.employeeName}!\n\nView saved meetings using the "View Saved Forms" button.`);
   };
 
   const deleteMeeting = (meetingId) => {
