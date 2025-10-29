@@ -1930,11 +1930,12 @@ This completion rate should be our benchmark across all work streams.`}
               </button>
               <button
                 onClick={() => {
+                  loadSavedMeetings(); // Load meetings into state first
                   const savedMeetings = Object.keys(localStorage).filter(key => key.startsWith('meeting_'));
                   if (savedMeetings.length > 0) {
                     setShowSavedMeetings(true);
                   } else {
-                    alert('No saved meetings found.');
+                    alert('No saved meetings found. Try saving the current form first!');
                   }
                 }}
                 className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
