@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Download, Eye, Filter, X, FileText, Building2, MapPin, Tag, Plus, Edit2, Trash2, ExternalLink, Save, Upload, FileUp, RefreshCw, LogOut, LogIn, BookOpen, Code } from 'lucide-react';
+import { Search, Download, Eye, Filter, X, FileText, Building2, MapPin, Tag, Plus, Edit2, Trash2, ExternalLink, Save, Upload, FileUp, RefreshCw, LogOut, LogIn, BookOpen, Code, Users } from 'lucide-react';
 
 // Supabase configuration
 const SUPABASE_URL = 'https://djxamnmqtcymejoquvav.supabase.co';
@@ -29,7 +29,7 @@ const supabaseRequest = async (endpoint, options = {}) => {
 };
 
 const EngineeringStandardsApp = () => {
-  const [currentPage, setCurrentPage] = useState('standards'); // 'standards' or 'macros'
+  const [currentPage, setCurrentPage] = useState('standards'); // 'standards', 'macros', or 'meetings'
   const [standards, setStandards] = useState([]);
   const [macros, setMacros] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,6 +75,41 @@ const EngineeringStandardsApp = () => {
     status: 'documented',
     videoUrl: ''
   });
+
+  // Meeting form state
+  const [meetingFormData, setMeetingFormData] = useState({
+    date: '',
+    participant: '',
+    metricsAnalysis: '',
+    wins: '',
+    blockers: '',
+    recognition: '',
+    boneCompletion: '',
+    boneEfficiency: '',
+    designCompletion: '',
+    designEfficiency: '',
+    overallKPIs: '',
+    whatsWorking: '',
+    outcomeDiscuss: '',
+    metricToMove: '',
+    currentMeasure: '',
+    targetNumbers: '',
+    agreement: '',
+    capacity: '',
+    support: '',
+    managerPerformance: '',
+    managerLiked: '',
+    managerImprovement: '',
+    reportPerformance: '',
+    reportLiked: '',
+    reportImprovement: '',
+    oneMetric: '',
+    actionItems: ''
+  });
+
+  const [savedMeetings, setSavedMeetings] = useState([]);
+  const [showMeetingHistory, setShowMeetingHistory] = useState(false);
+  const [viewingMeeting, setViewingMeeting] = useState(null);
 
   // Check if user is logged in and load saved credentials
   useEffect(() => {
@@ -177,7 +212,111 @@ const EngineeringStandardsApp = () => {
   useEffect(() => {
     loadStandards();
     loadMacros();
+    loadSavedMeetings();
+    
+    // Initialize meeting form with today's date
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    setMeetingFormData(prev => ({
+      ...prev,
+      date: today.toLocaleDateString('en-US', options)
+    }));
   }, []);
+
+  const loadSavedMeetings = () => {
+    const meetings = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('meeting_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          meetings.push({
+            id: key,
+            ...data,
+            savedAt: new Date(data.savedAt || Date.now())
+          });
+        } catch (error) {
+          console.error('Error loading meeting:', key, error);
+        }
+      }
+    }
+    meetings.sort((a, b) => b.savedAt - a.savedAt);
+    setSavedMeetings(meetings);
+  };
+
+  const saveMeetingForm = () => {
+    if (!meetingFormData.participant.trim()) {
+      alert('Please enter a participant name before saving.');
+      return;
+    }
+
+    const now = new Date();
+    const timestamp = now.toISOString().split('T')[0] + '_' + now.getTime();
+    const storageKey = `meeting_${meetingFormData.participant.replace(/\s+/g, '_')}_${timestamp}`;
+    
+    const meetingData = {
+      ...meetingFormData,
+      savedAt: now.toISOString(),
+      id: storageKey
+    };
+    
+    localStorage.setItem(storageKey, JSON.stringify(meetingData));
+    loadSavedMeetings();
+    
+    alert(`✅ Meeting notes saved for ${meetingFormData.participant}!\n\nView saved meetings in the history section.`);
+  };
+
+  const deleteMeeting = (meetingId) => {
+    if (window.confirm('Are you sure you want to delete this meeting record?')) {
+      localStorage.removeItem(meetingId);
+      loadSavedMeetings();
+      if (viewingMeeting && viewingMeeting.id === meetingId) {
+        setViewingMeeting(null);
+      }
+    }
+  };
+
+  const clearMeetingForm = () => {
+    if (window.confirm('Are you sure you want to clear the current form?')) {
+      const today = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      setMeetingFormData({
+        date: today.toLocaleDateString('en-US', options),
+        participant: '',
+        metricsAnalysis: '',
+        wins: '',
+        blockers: '',
+        recognition: '',
+        boneCompletion: '',
+        boneEfficiency: '',
+        designCompletion: '',
+        designEfficiency: '',
+        overallKPIs: '',
+        whatsWorking: '',
+        outcomeDiscuss: '',
+        metricToMove: '',
+        currentMeasure: '',
+        targetNumbers: '',
+        agreement: '',
+        capacity: '',
+        support: '',
+        managerPerformance: '',
+        managerLiked: '',
+        managerImprovement: '',
+        reportPerformance: '',
+        reportLiked: '',
+        reportImprovement: '',
+        oneMetric: '',
+        actionItems: ''
+      });
+    }
+  };
+
+  const loadMeetingForm = (meeting) => {
+    setMeetingFormData(meeting);
+    setViewingMeeting(null);
+    setShowMeetingHistory(false);
+  };
 
   const states = useMemo(() => {
     const stateSet = new Set(standards.map(s => s.state));
@@ -754,6 +893,17 @@ const EngineeringStandardsApp = () => {
                   <Code className="w-4 h-4" />
                   Macros
                 </button>
+                <button
+                  onClick={() => setCurrentPage('meetings')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === 'meetings' 
+                      ? 'bg-orange-600 text-white' 
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  Meetings
+                </button>
               </nav>
 
               <span className="px-2 py-1 text-xs font-medium rounded bg-green-900 text-green-300">
@@ -1055,7 +1205,7 @@ const EngineeringStandardsApp = () => {
         </div>
       )}
 
-      {currentPage === 'standards' ? (
+      {currentPage === 'standards' && (
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex gap-6">
             {showFilters && (
@@ -1244,7 +1394,9 @@ const EngineeringStandardsApp = () => {
           </main>
         </div>
       </div>
-      ) : (
+      )}
+
+      {currentPage === 'macros' && (
         /* Macros Page */
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="mb-6">
@@ -1381,6 +1533,341 @@ const EngineeringStandardsApp = () => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {currentPage === 'meetings' && (
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-white">One-on-One Meeting Form</h2>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    const savedMeetings = Object.keys(localStorage).filter(key => key.startsWith('meeting_'));
+                    if (savedMeetings.length > 0) {
+                      setShowSavedMeetings(true);
+                    } else {
+                      alert('No saved meetings found.');
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <Eye className="w-4 h-4" />
+                  View Saved Forms
+                </button>
+              </div>
+            </div>
+            
+            <form className="space-y-6">
+              {/* Meeting Details Section */}
+              <div className="border-b border-gray-600 pb-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Meeting Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Employee Name</label>
+                    <input
+                      type="text"
+                      value={meetingForm.employeeName}
+                      onChange={(e) => setMeetingForm({...meetingForm, employeeName: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Enter employee name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Manager Name</label>
+                    <input
+                      type="text"
+                      value={meetingForm.managerName}
+                      onChange={(e) => setMeetingForm({...meetingForm, managerName: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Enter manager name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Meeting Date</label>
+                    <input
+                      type="date"
+                      value={meetingForm.meetingDate}
+                      onChange={(e) => setMeetingForm({...meetingForm, meetingDate: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Next Meeting Date</label>
+                    <input
+                      type="date"
+                      value={meetingForm.nextMeetingDate}
+                      onChange={(e) => setMeetingForm({...meetingForm, nextMeetingDate: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Performance and Goals Section */}
+              <div className="border-b border-gray-600 pb-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Performance & Goals</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Current Performance Rating</label>
+                    <select
+                      value={meetingForm.performanceRating}
+                      onChange={(e) => setMeetingForm({...meetingForm, performanceRating: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                      <option value="">Select rating</option>
+                      <option value="Exceeds Expectations">Exceeds Expectations</option>
+                      <option value="Meets Expectations">Meets Expectations</option>
+                      <option value="Below Expectations">Below Expectations</option>
+                      <option value="Needs Improvement">Needs Improvement</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Key Achievements Since Last Meeting</label>
+                    <textarea
+                      value={meetingForm.achievements}
+                      onChange={(e) => setMeetingForm({...meetingForm, achievements: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="List key achievements and successes..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Current Goals Progress</label>
+                    <textarea
+                      value={meetingForm.goalsProgress}
+                      onChange={(e) => setMeetingForm({...meetingForm, goalsProgress: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Update on progress towards current goals..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">New Goals for Next Period</label>
+                    <textarea
+                      value={meetingForm.newGoals}
+                      onChange={(e) => setMeetingForm({...meetingForm, newGoals: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Set new goals and objectives..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Challenges and Support Section */}
+              <div className="border-b border-gray-600 pb-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Challenges & Support</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Current Challenges</label>
+                    <textarea
+                      value={meetingForm.challenges}
+                      onChange={(e) => setMeetingForm({...meetingForm, challenges: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Discuss any challenges or obstacles..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Support Needed</label>
+                    <textarea
+                      value={meetingForm.supportNeeded}
+                      onChange={(e) => setMeetingForm({...meetingForm, supportNeeded: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="What support or resources are needed..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Training/Development Needs</label>
+                    <textarea
+                      value={meetingForm.trainingNeeds}
+                      onChange={(e) => setMeetingForm({...meetingForm, trainingNeeds: e.target.value})}
+                      rows={3}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Any training or development opportunities needed..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Feedback and Communication Section */}
+              <div className="border-b border-gray-600 pb-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Feedback & Communication</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Employee Feedback/Concerns</label>
+                    <textarea
+                      value={meetingForm.employeeFeedback}
+                      onChange={(e) => setMeetingForm({...meetingForm, employeeFeedback: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Employee's feedback, suggestions, or concerns..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Manager Feedback</label>
+                    <textarea
+                      value={meetingForm.managerFeedback}
+                      onChange={(e) => setMeetingForm({...meetingForm, managerFeedback: e.target.value})}
+                      rows={4}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Manager's feedback and observations..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Communication Preferences</label>
+                    <input
+                      type="text"
+                      value={meetingForm.communicationPreferences}
+                      onChange={(e) => setMeetingForm({...meetingForm, communicationPreferences: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Preferred communication style and frequency..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Items Section */}
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-4">Action Items & Next Steps</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Action Items for Employee</label>
+                    <textarea
+                      value={meetingForm.employeeActions}
+                      onChange={(e) => setMeetingForm({...meetingForm, employeeActions: e.target.value})}
+                      rows={3}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Specific action items for the employee..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Action Items for Manager</label>
+                    <textarea
+                      value={meetingForm.managerActions}
+                      onChange={(e) => setMeetingForm({...meetingForm, managerActions: e.target.value})}
+                      rows={3}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Specific action items for the manager..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Additional Notes</label>
+                    <textarea
+                      value={meetingForm.additionalNotes}
+                      onChange={(e) => setMeetingForm({...meetingForm, additionalNotes: e.target.value})}
+                      rows={3}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Any additional notes or comments..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex gap-4 pt-6 border-t border-gray-600">
+                <button
+                  type="button"
+                  onClick={saveMeetingForm}
+                  className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                >
+                  <Save className="w-5 h-5" />
+                  Save Meeting Form
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMeetingForm({
+                      employeeName: '',
+                      managerName: '',
+                      meetingDate: '',
+                      nextMeetingDate: '',
+                      performanceRating: '',
+                      achievements: '',
+                      goalsProgress: '',
+                      newGoals: '',
+                      challenges: '',
+                      supportNeeded: '',
+                      trainingNeeds: '',
+                      employeeFeedback: '',
+                      managerFeedback: '',
+                      communicationPreferences: '',
+                      employeeActions: '',
+                      managerActions: '',
+                      additionalNotes: ''
+                    });
+                  }}
+                  className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  Clear Form
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Saved Meetings Modal */}
+      {showSavedMeetings && (
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="p-6 border-b border-gray-700 sticky top-0 bg-gray-800">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Saved Meeting Forms</h2>
+                <button
+                  onClick={() => setShowSavedMeetings(false)}
+                  className="p-2 text-gray-400 hover:text-white"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              {savedMeetings.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">No saved meeting forms found.</p>
+              ) : (
+                <div className="space-y-4">
+                  {savedMeetings.map((meeting, index) => (
+                    <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-white">
+                          {meeting.employeeName} - {meeting.managerName}
+                        </h3>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setMeetingForm(meeting);
+                              setShowSavedMeetings(false);
+                            }}
+                            className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                          >
+                            <Edit className="w-4 h-4" />
+                            Load
+                          </button>
+                          <button
+                            onClick={() => deleteMeeting(index)}
+                            className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-300">
+                        <p><strong>Meeting Date:</strong> {meeting.meetingDate}</p>
+                        <p><strong>Performance Rating:</strong> {meeting.performanceRating}</p>
+                        <p><strong>Saved:</strong> {new Date(meeting.timestamp).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
