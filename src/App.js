@@ -1658,81 +1658,92 @@ October Metrics Summary:
               
               {/* Metrics Dashboard */}
               <div className="bg-gray-900 rounded-lg p-6 mb-6">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="text-2xl">📊</div>
-                  <h4 className="text-lg font-semibold text-white">Your Metrics Dashboard</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="text-2xl">📊</div>
+                    <h4 className="text-lg font-semibold text-white">Your Metrics Dashboard</h4>
+                  </div>
+                  <a
+                    href="https://app.precision.co/scorecards/64"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Live Scorecard
+                  </a>
                 </div>
                 
                 {/* Bone Jobs Metrics */}
-                <div className="mb-8">
-                  <h5 className="text-blue-400 font-semibold mb-4 text-lg">Bone Jobs</h5>
+                <div className="mb-6">
+                  <h5 className="text-blue-400 font-semibold mb-3">Bone Jobs</h5>
                   <div className="grid grid-cols-4 gap-4 mb-4">
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Active Projects</div>
-                      <div className="text-3xl font-bold text-blue-400 mb-1">18</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">18</div>
+                      <div className="text-xs text-gray-400">Active Projects</div>
                       <div className="text-xs text-green-400">October Actuals</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Total Bones</div>
-                      <div className="text-3xl font-bold text-blue-400 mb-1">38</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">38</div>
+                      <div className="text-xs text-gray-400">Total Bones</div>
                       <div className="text-xs text-green-400">October Actuals</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Bones Finished</div>
-                      <div className="text-3xl font-bold text-blue-400 mb-1">30</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">30</div>
+                      <div className="text-xs text-gray-400">Bones Finished</div>
                       <div className="text-xs text-green-400">October Actuals</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Completion %</div>
-                      <div className="text-3xl font-bold text-orange-400 mb-1">78.95%</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-400">78.95%</div>
+                      <div className="text-xs text-gray-400">Completion %</div>
                       <div className="text-xs text-red-400">vs 100% goal</div>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Estimated Hours</div>
-                      <div className="text-2xl font-bold text-blue-400">118</div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">119</div>
+                      <div className="text-xs text-gray-400">Estimated Hours</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Actual Hours</div>
-                      <div className="text-2xl font-bold text-blue-400">59</div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">59</div>
+                      <div className="text-xs text-gray-400">Actual Hours</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Design Jobs Metrics */}
                 <div>
-                  <h5 className="text-blue-400 font-semibold mb-4 text-lg">Design Jobs</h5>
+                  <h5 className="text-blue-400 font-semibold mb-3">Design Jobs</h5>
                   <div className="grid grid-cols-4 gap-4 mb-4">
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Active Projects</div>
-                      <div className="text-3xl font-bold text-blue-400 mb-1">3</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">3</div>
+                      <div className="text-xs text-gray-400">Active Projects</div>
                       <div className="text-xs text-green-400">October Actuals</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Tasks Created</div>
-                      <div className="text-3xl font-bold text-blue-400 mb-1">94</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">94</div>
+                      <div className="text-xs text-gray-400">Tasks Created</div>
                       <div className="text-xs text-green-400">October Actuals</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Tasks Completed</div>
-                      <div className="text-3xl font-bold text-blue-400 mb-1">89</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">89</div>
+                      <div className="text-xs text-gray-400">Tasks Completed</div>
                       <div className="text-xs text-green-400">October Actuals</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Completion %</div>
-                      <div className="text-3xl font-bold text-green-400 mb-1">94.68%</div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-400">94.68%</div>
+                      <div className="text-xs text-gray-400">Completion %</div>
                       <div className="text-xs text-green-400">Strong performance</div>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Estimated Hours</div>
-                      <div className="text-2xl font-bold text-blue-400">206</div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">206</div>
+                      <div className="text-xs text-gray-400">Estimated Hours</div>
                     </div>
-                    <div className="bg-gray-800 rounded-lg p-4 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Actual Hours</div>
-                      <div className="text-2xl font-bold text-blue-400">162</div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">162</div>
+                      <div className="text-xs text-gray-400">Actual Hours</div>
                     </div>
                   </div>
                 </div>
