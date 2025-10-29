@@ -1613,274 +1613,352 @@ October Metrics Summary:
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-white">One-on-One Meeting Form</h2>
-              {/* Fixed state variable issues for proper deployment */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    const savedMeetings = Object.keys(localStorage).filter(key => key.startsWith('meeting_'));
-                    if (savedMeetings.length > 0) {
-                      setShowSavedMeetings(true);
-                    } else {
-                      alert('No saved meetings found.');
-                    }
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  <Eye className="w-4 h-4" />
-                  View Saved Forms
-                </button>
-              </div>
+              <h2 className="text-3xl font-bold text-white">One-on-One Meeting</h2>
+              <div className="text-sm text-gray-400">Recognition → Elevation | You run this meeting</div>
             </div>
             
-            <form className="space-y-6">
-              {/* Meeting Details Section */}
-              <div className="border-b border-gray-600 pb-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Meeting Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Employee Name</label>
-                    <input
-                      type="text"
-                      value={meetingForm.employeeName}
-                      onChange={(e) => setMeetingForm({...meetingForm, employeeName: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Enter employee name"
-                    />
+            {/* Meeting Details Section */}
+            <div className="border-l-4 border-blue-500 pl-6 mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="bg-blue-500 rounded-full p-1">
+                  <Users className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-blue-400">Meeting Details</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Date:</label>
+                  <input
+                    type="date"
+                    value={meetingForm.meetingDate}
+                    onChange={(e) => setMeetingForm({...meetingForm, meetingDate: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Participant:</label>
+                  <input
+                    type="text"
+                    value={meetingForm.employeeName}
+                    onChange={(e) => setMeetingForm({...meetingForm, employeeName: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
+                    placeholder="Team member name"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Prepare YOUR List Section */}
+            <div className="border-l-4 border-blue-500 pl-6 mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="bg-blue-500 rounded-full p-1 text-white font-bold text-sm flex items-center justify-center w-6 h-6">1</div>
+                <h3 className="text-xl font-semibold text-blue-400">Prepare YOUR List</h3>
+              </div>
+              <p className="text-gray-300 text-sm mb-4 italic">You run this meeting. Bring your key metrics, wins, and blockers. Show me your dashboard — numbers tell the story.</p>
+              
+              {/* Metrics Dashboard */}
+              <div className="bg-gray-900 rounded-lg p-6 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-2xl">📊</div>
+                  <h4 className="text-lg font-semibold text-white">Your Metrics Dashboard</h4>
+                </div>
+                
+                {/* Bone Jobs Metrics */}
+                <div className="mb-6">
+                  <h5 className="text-blue-400 font-semibold mb-3">Bone Jobs</h5>
+                  <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">18</div>
+                      <div className="text-xs text-gray-400">Active Projects</div>
+                      <div className="text-xs text-green-400">October Actuals</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">38</div>
+                      <div className="text-xs text-gray-400">Total Bones</div>
+                      <div className="text-xs text-green-400">October Actuals</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">30</div>
+                      <div className="text-xs text-gray-400">Bones Finished</div>
+                      <div className="text-xs text-green-400">October Actuals</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-400">78.95%</div>
+                      <div className="text-xs text-gray-400">Completion %</div>
+                      <div className="text-xs text-red-400">vs 100% goal</div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Manager Name</label>
-                    <input
-                      type="text"
-                      value={meetingForm.managerName}
-                      onChange={(e) => setMeetingForm({...meetingForm, managerName: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Enter manager name"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">119</div>
+                      <div className="text-xs text-gray-400">Estimated Hours</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">59</div>
+                      <div className="text-xs text-gray-400">Actual Hours</div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Meeting Date</label>
-                    <input
-                      type="date"
-                      value={meetingForm.meetingDate}
-                      onChange={(e) => setMeetingForm({...meetingForm, meetingDate: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
+                </div>
+
+                {/* Design Jobs Metrics */}
+                <div>
+                  <h5 className="text-blue-400 font-semibold mb-3">Design Jobs</h5>
+                  <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">3</div>
+                      <div className="text-xs text-gray-400">Active Projects</div>
+                      <div className="text-xs text-green-400">October Actuals</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">94</div>
+                      <div className="text-xs text-gray-400">Tasks Created</div>
+                      <div className="text-xs text-green-400">October Actuals</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-400">89</div>
+                      <div className="text-xs text-gray-400">Tasks Completed</div>
+                      <div className="text-xs text-green-400">October Actuals</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-400">94.68%</div>
+                      <div className="text-xs text-gray-400">Completion %</div>
+                      <div className="text-xs text-green-400">Strong performance</div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Next Meeting Date</label>
-                    <input
-                      type="date"
-                      value={meetingForm.nextMeetingDate}
-                      onChange={(e) => setMeetingForm({...meetingForm, nextMeetingDate: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">206</div>
+                      <div className="text-xs text-gray-400">Estimated Hours</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">162</div>
+                      <div className="text-xs text-gray-400">Actual Hours</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Performance and Goals Section */}
-              <div className="border-b border-gray-600 pb-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Performance & Goals</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Current Performance Rating</label>
-                    <select
-                      value={meetingForm.performanceRating}
-                      onChange={(e) => setMeetingForm({...meetingForm, performanceRating: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                      <option value="">Select rating</option>
-                      <option value="Exceeds Expectations">Exceeds Expectations</option>
-                      <option value="Meets Expectations">Meets Expectations</option>
-                      <option value="Below Expectations">Below Expectations</option>
-                      <option value="Needs Improvement">Needs Improvement</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Key Achievements Since Last Meeting</label>
-                    <textarea
-                      value={meetingForm.achievements}
-                      onChange={(e) => setMeetingForm({...meetingForm, achievements: e.target.value})}
-                      rows={4}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="List key achievements and successes..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Current Goals Progress</label>
-                    <textarea
-                      value={meetingForm.goalsProgress}
-                      onChange={(e) => setMeetingForm({...meetingForm, goalsProgress: e.target.value})}
-                      rows={4}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Update on progress towards current goals..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">New Goals for Next Period</label>
-                    <textarea
-                      value={meetingForm.newGoals}
-                      onChange={(e) => setMeetingForm({...meetingForm, newGoals: e.target.value})}
-                      rows={4}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Set new goals and objectives..."
-                    />
-                  </div>
-                </div>
+              {/* Analysis Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Your Analysis of the Numbers:</label>
+                <textarea
+                  value={`Clear Tale of Two Workflows:
+
+DESIGN JOBS - Excellence Zone (94.68% completion)
+• Nearly perfect task completion with 89 of 94 tasks done
+
+BONE JOBS COMPLETION GAP (21% below target)
+• 8 incomplete bones preventing us from hitting 100% goal
+• Root cause unknown - need to identify if it's capacity, dependencies, scope creep, or process breakdown`}
+                  onChange={(e) => setMeetingForm({...meetingForm, achievements: e.target.value})}
+                  rows={6}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                />
               </div>
 
-              {/* Challenges and Support Section */}
-              <div className="border-b border-gray-600 pb-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Challenges & Support</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Current Challenges</label>
-                    <textarea
-                      value={meetingForm.challenges}
-                      onChange={(e) => setMeetingForm({...meetingForm, challenges: e.target.value})}
-                      rows={4}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Discuss any challenges or obstacles..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Support Needed</label>
-                    <textarea
-                      value={meetingForm.supportNeeded}
-                      onChange={(e) => setMeetingForm({...meetingForm, supportNeeded: e.target.value})}
-                      rows={4}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="What support or resources are needed..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Training/Development Needs</label>
-                    <textarea
-                      value={meetingForm.trainingNeeds}
-                      onChange={(e) => setMeetingForm({...meetingForm, trainingNeeds: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Any training or development opportunities needed..."
-                    />
-                  </div>
-                </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Wins:</label>
+                <textarea
+                  value={`🎯 DESIGN WORKFLOW MASTERY
+• 94.68% completion rate is exceptional - nearly flawless execution
+• Task management system is clearly working (89/94 completed)
+• Hour tracking shows we're efficient without cutting corners`}
+                  onChange={(e) => setMeetingForm({...meetingForm, goalsProgress: e.target.value})}
+                  rows={4}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                />
               </div>
 
-              {/* Feedback and Communication Section */}
-              <div className="border-b border-gray-600 pb-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Feedback & Communication</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Employee Feedback/Concerns</label>
-                    <textarea
-                      value={meetingForm.employeeFeedback}
-                      onChange={(e) => setMeetingForm({...meetingForm, employeeFeedback: e.target.value})}
-                      rows={4}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Employee's feedback, suggestions, or concerns..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Manager Feedback</label>
-                    <textarea
-                      value={meetingForm.managerFeedback}
-                      onChange={(e) => setMeetingForm({...meetingForm, managerFeedback: e.target.value})}
-                      rows={4}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Manager's feedback and observations..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Communication Preferences</label>
-                    <input
-                      type="text"
-                      value={meetingForm.communicationPreferences}
-                      onChange={(e) => setMeetingForm({...meetingForm, communicationPreferences: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Preferred communication style and frequency..."
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Items Section */}
               <div>
-                <h3 className="text-xl font-semibold text-white mb-4">Action Items & Next Steps</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Action Items for Employee</label>
-                    <textarea
-                      value={meetingForm.employeeActions}
-                      onChange={(e) => setMeetingForm({...meetingForm, employeeActions: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Specific action items for the employee..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Action Items for Manager</label>
-                    <textarea
-                      value={meetingForm.managerActions}
-                      onChange={(e) => setMeetingForm({...meetingForm, managerActions: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Specific action items for the manager..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Additional Notes</label>
-                    <textarea
-                      value={meetingForm.additionalNotes}
-                      onChange={(e) => setMeetingForm({...meetingForm, additionalNotes: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      placeholder="Any additional notes or comments..."
-                    />
-                  </div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Blockers:</label>
+                <textarea
+                  value={`🚧 BONE JOBS COMPLETION GAP (21% below target)
+• 8 incomplete bones preventing us from hitting 100% goal
+• Root cause unknown - need to identify if it's capacity, dependencies, scope creep, or process breakdown`}
+                  onChange={(e) => setMeetingForm({...meetingForm, challenges: e.target.value})}
+                  rows={4}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Start with Wins Section */}
+            <div className="border-l-4 border-blue-500 pl-6 mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="bg-blue-500 rounded-full p-1 text-white font-bold text-sm flex items-center justify-center w-6 h-6">2</div>
+                <h3 className="text-xl font-semibold text-blue-400">Start with Wins</h3>
+              </div>
+              <p className="text-gray-300 text-sm mb-4 italic">Recognition → Elevation. What's working? Where did you move the needle? We start with momentum.</p>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Recognition & Wins:</label>
+                <textarea
+                  value={`🏆 EXCEPTIONAL DESIGN PERFORMANCE
+Your Design workflow is operating at an elite level - 94.68% completion rate is outstanding. This isn't luck, this is systems, discipline, and skill. You're managing 94 tasks across 3 projects and completing nearly everything you touch. This is the standard.`}
+                  onChange={(e) => setMeetingForm({...meetingForm, employeeFeedback: e.target.value})}
+                  rows={4}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Check the Metrics Section */}
+            <div className="border-l-4 border-blue-500 pl-6 mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="bg-blue-500 rounded-full p-1 text-white font-bold text-sm flex items-center justify-center w-6 h-6">3</div>
+                <h3 className="text-xl font-semibold text-blue-400">Check the Metrics</h3>
+              </div>
+              
+              {/* Bone Jobs Performance */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <h4 className="text-white font-semibold">Bone Jobs Performance</h4>
+                </div>
+                <div className="mb-4">
+                  <div className="text-sm font-medium text-gray-300 mb-2">Bone Completion Rate: 78.95% vs 100% Goal</div>
+                  <textarea
+                    value={`30 bones finished out of 38 total = 8 bones incomplete. This is a 21-point gap from our 100% goal.`}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-300 mb-2">Hour Efficiency: 59 actual vs 118 estimated</div>
+                  <textarea
+                    value={`This 50% efficiency rate is a red flag - but which direction?
+
+SCENARIO A: We're not tracking all our time → Actual work is higher than 59 hours
+SCENARIO B: Our estimates are massively inflated → We need better scoping`}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                    rows={4}
+                  />
                 </div>
               </div>
 
-              {/* Form Actions */}
-              <div className="flex gap-4 pt-6 border-t border-gray-600">
-                <button
-                  type="button"
-                  onClick={saveMeetingForm}
-                  className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-                >
-                  <Save className="w-5 h-5" />
-                  Save Meeting Form
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMeetingForm({
-                      employeeName: '',
-                      managerName: '',
-                      meetingDate: '',
-                      nextMeetingDate: '',
-                      performanceRating: '',
-                      achievements: '',
-                      goalsProgress: '',
-                      newGoals: '',
-                      challenges: '',
-                      supportNeeded: '',
-                      trainingNeeds: '',
-                      employeeFeedback: '',
-                      managerFeedback: '',
-                      communicationPreferences: '',
-                      employeeActions: '',
-                      managerActions: '',
-                      additionalNotes: ''
-                    });
-                  }}
-                  className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium"
-                >
-                  <RefreshCw className="w-5 h-5" />
-                  Clear Form
-                </button>
+              {/* Design Jobs Performance */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <h4 className="text-white font-semibold">Design Jobs Performance</h4>
+                </div>
+                <div className="mb-4">
+                  <div className="text-sm font-medium text-gray-300 mb-2">Design Task Completion: 94.68% - Strong! ✅</div>
+                  <textarea
+                    value={`89 out of 94 tasks completed - this is elite execution. Only 5 tasks remain outstanding.
+
+This completion rate should be our benchmark across all work streams.`}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-300 mb-2">Design Hours: 162 actual vs 206 estimated</div>
+                  <textarea
+                    value={`Running at 79% of estimated hours - this is the sweet spot. We're:
+✅ Delivering on commitments
+✅ Not burning through budgets`}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                    rows={3}
+                  />
+                </div>
               </div>
-            </form>
+
+              {/* Overall Assessment */}
+              <div className="mb-6">
+                <div className="text-sm font-medium text-gray-300 mb-2">Overall: Are we hitting our goals?</div>
+                <textarea
+                  value={`MIXED RESULTS:
+✅ Design: EXCEEDING expectations at 94.68% - this is A+ work
+⚠️ Bones: BELOW target at 78.95% - need to close 21-point gap`}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <div className="text-sm font-medium text-gray-300 mb-2">What's working / what's not?</div>
+                <textarea
+                  value={`✅ WHAT'S WORKING:
+• Design task management system - nearly perfect execution
+• Design estimation process - healthy 79% efficiency ratio
+• Overall volume management - 21 active projects is ambitious and you're handling it`}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            {/* Goals & OKR Review Section */}
+            <div className="bg-blue-900 bg-opacity-30 rounded-lg p-6 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="text-2xl">📊</div>
+                <h4 className="text-lg font-semibold text-blue-400">Goals & OKR Review</h4>
+              </div>
+              <p className="text-gray-300 text-sm mb-4">This is an opportunity to review progress, discuss how your direct report is doing, and explore ways to support their success moving forward.</p>
+              <div>
+                <div className="text-sm font-medium text-gray-300 mb-2">Key Questions: Why is Design outperforming Bones? What blockers exist in Bone Jobs? How can we replicate Design success?</div>
+                <textarea
+                  value={meetingForm.additionalNotes}
+                  onChange={(e) => setMeetingForm({...meetingForm, additionalNotes: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                  rows={3}
+                  placeholder="Discussion notes and action items..."
+                />
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex gap-4 pt-6 border-t border-gray-600">
+              <button
+                onClick={saveMeetingForm}
+                className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+              >
+                <Save className="w-5 h-5" />
+                Save Meeting Form
+              </button>
+              <button
+                onClick={() => {
+                  const savedMeetings = Object.keys(localStorage).filter(key => key.startsWith('meeting_'));
+                  if (savedMeetings.length > 0) {
+                    setShowSavedMeetings(true);
+                  } else {
+                    alert('No saved meetings found.');
+                  }
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              >
+                <Eye className="w-5 h-5" />
+                View Saved Forms
+              </button>
+              <button
+                onClick={() => {
+                  setMeetingForm({
+                    employeeName: 'Design Team Member',
+                    managerName: 'Engineering Manager',
+                    meetingDate: '2025-10-30',
+                    nextMeetingDate: '2025-11-06',
+                    performanceRating: 'Exceeds Expectations',
+                    achievements: '',
+                    goalsProgress: '',
+                    newGoals: '',
+                    challenges: '',
+                    supportNeeded: '',
+                    trainingNeeds: '',
+                    employeeFeedback: '',
+                    managerFeedback: '',
+                    communicationPreferences: '',
+                    employeeActions: '',
+                    managerActions: '',
+                    additionalNotes: ''
+                  });
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium"
+              >
+                <RefreshCw className="w-5 h-5" />
+                Reset Form
+              </button>
+            </div>
           </div>
         </div>
       )}
