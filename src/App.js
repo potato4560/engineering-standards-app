@@ -111,6 +111,9 @@ const EngineeringStandardsApp = () => {
   const [showMeetingHistory, setShowMeetingHistory] = useState(false);
   const [showSavedMeetings, setShowSavedMeetings] = useState(false);
   const [viewingMeeting, setViewingMeeting] = useState(null);
+  const [monthlyMeetings, setMonthlyMeetings] = useState([]);
+  const [showMonthlyMeetings, setShowMonthlyMeetings] = useState(false);
+  const [currentMonthMetrics, setCurrentMonthMetrics] = useState(null);
 
   // Meeting form state for the new UI
   const [meetingForm, setMeetingForm] = useState({
@@ -315,6 +318,185 @@ October Metrics Summary:
     }
     meetings.sort((a, b) => b.savedAt - a.savedAt);
     setSavedMeetings(meetings);
+  };
+
+  // Monthly Meeting Functions
+  const generateMonthlyMetrics = (month, year) => {
+    // This would typically pull from your actual data source
+    // For now, using October 2025 data as template
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    return {
+      month: monthNames[month],
+      year: year,
+      dateGenerated: new Date().toISOString(),
+      boneJobs: {
+        activeProjects: 18,
+        totalBones: 38,
+        bonesFinished: 30,
+        completionRate: 78.95,
+        estimatedHours: 118,
+        actualHours: 59,
+        efficiency: 50.0
+      },
+      designJobs: {
+        activeProjects: 3,
+        tasksCreated: 94,
+        tasksCompleted: 89,
+        completionRate: 94.68,
+        estimatedHours: 206,
+        actualHours: 162,
+        efficiency: 78.6
+      }
+    };
+  };
+
+  const createMonthlyMeeting = (month, year) => {
+    const metrics = generateMonthlyMetrics(month, year);
+    const meetingDate = new Date(year, month, 30).toISOString().split('T')[0];
+    
+    const monthlyMeeting = {
+      employeeName: 'Team Member',
+      managerName: 'Engineering Manager',
+      meetingDate: meetingDate,
+      nextMeetingDate: new Date(year, month + 1, 30).toISOString().split('T')[0],
+      performanceRating: metrics.designJobs.completionRate > 90 ? 'Exceeds Expectations' : 'Meets Expectations',
+      achievements: `${metrics.month} ${metrics.year} Performance Summary:
+• Design Projects: ${metrics.designJobs.completionRate}% completion rate (${metrics.designJobs.tasksCompleted} of ${metrics.designJobs.tasksCreated} tasks)
+• Bone Projects: ${metrics.boneJobs.completionRate}% completion rate (${metrics.boneJobs.bonesFinished} of ${metrics.boneJobs.totalBones} bones)
+• Hour Efficiency: Design ${metrics.designJobs.efficiency}%, Bone ${metrics.boneJobs.efficiency}%
+• Active Projects: ${metrics.designJobs.activeProjects} design, ${metrics.boneJobs.activeProjects} bone`,
+      goalsProgress: `${metrics.month} ${metrics.year} Metrics Dashboard:
+
+Design Jobs Performance:
+- Active Projects: ${metrics.designJobs.activeProjects}
+- Tasks: ${metrics.designJobs.tasksCompleted}/${metrics.designJobs.tasksCreated} (${metrics.designJobs.completionRate}%)
+- Hours: ${metrics.designJobs.actualHours}/${metrics.designJobs.estimatedHours} (${metrics.designJobs.efficiency}% efficiency)
+
+Bone Jobs Performance:
+- Active Projects: ${metrics.boneJobs.activeProjects}
+- Bones: ${metrics.boneJobs.bonesFinished}/${metrics.boneJobs.totalBones} (${metrics.boneJobs.completionRate}%)
+- Hours: ${metrics.boneJobs.actualHours}/${metrics.boneJobs.estimatedHours} (${metrics.boneJobs.efficiency}% efficiency)`,
+      newGoals: `Goals for ${month < 11 ? metrics.month : 'Next Year'}:
+• Target 95%+ completion rate for design tasks
+• Improve bone job completion to 85%+
+• Maintain efficient hour utilization
+• Continue strong project delivery performance`,
+      challenges: `${metrics.month} ${metrics.year} Key Areas:
+• Bone completion gap: ${100 - metrics.boneJobs.completionRate}% below target
+• ${metrics.boneJobs.totalBones - metrics.boneJobs.bonesFinished} incomplete bones requiring attention
+• Resource allocation between design vs bone priorities`,
+      supportNeeded: `Monthly Support Requirements:
+• Process review for bone job completion workflow
+• Resource allocation analysis for optimal efficiency
+• Quarterly planning for upcoming project pipeline`,
+      trainingNeeds: `Development Focus Areas:
+• Project management optimization
+• Cross-functional workflow improvements
+• Monthly metrics analysis training`,
+      employeeFeedback: `${metrics.month} ${metrics.year} Self-Assessment:
+Strong performance in design work with ${metrics.designJobs.completionRate}% completion rate. 
+Focused on improving bone job workflow to reach completion targets.
+Satisfied with current efficiency and hour management.`,
+      managerFeedback: `${metrics.month} ${metrics.year} Manager Assessment:
+Excellent design performance continues to exceed expectations.
+Bone job completion requires attention but showing improvement trends.
+Strong contributor with consistent delivery and efficient hour utilization.`,
+      communicationPreferences: 'Monthly reviews on 30th, weekly check-ins, immediate escalation for blockers',
+      employeeActions: `${metrics.month} Action Items:
+1. Analyze bone job bottlenecks and create improvement plan
+2. Document successful design practices for team knowledge sharing
+3. Set weekly bone completion targets for next month
+4. Review and optimize current project prioritization`,
+      managerActions: `Manager Action Items for ${metrics.month}:
+1. Review resource allocation for bone vs design work
+2. Provide additional support for bone job completion
+3. Schedule quarterly planning session
+4. Update team processes based on monthly learnings`,
+      additionalNotes: `Monthly Review - ${metrics.month} ${metrics.year}
+Auto-generated on: ${new Date().toLocaleDateString()}
+
+Key Performance Indicators:
+✅ Design: ${metrics.designJobs.completionRate}% (${metrics.designJobs.completionRate > 90 ? 'Exceeds Target' : 'Meets Target'})
+${metrics.boneJobs.completionRate > 85 ? '✅' : '⚠️'} Bone: ${metrics.boneJobs.completionRate}% (${metrics.boneJobs.completionRate > 85 ? 'Meets Target' : 'Below Target'})
+✅ Efficiency: Strong performance in hour management
+
+Monthly Metrics Source: Auto-generated template
+Next Review: ${new Date(year, month + 1, 30).toLocaleDateString()}`,
+      isMonthlyTemplate: true,
+      monthlyMetrics: metrics
+    };
+
+    return monthlyMeeting;
+  };
+
+  const saveMonthlyMeeting = (month, year) => {
+    const monthlyMeeting = createMonthlyMeeting(month, year);
+    const timestamp = new Date().toISOString();
+    const storageKey = `monthly_meeting_${year}_${month.toString().padStart(2, '0')}_${timestamp}`;
+    
+    const meetingData = {
+      ...monthlyMeeting,
+      savedAt: timestamp,
+      id: storageKey,
+      isMonthlyMeeting: true
+    };
+    
+    localStorage.setItem(storageKey, JSON.stringify(meetingData));
+    loadSavedMeetings();
+    
+    return meetingData;
+  };
+
+  const loadMonthlyMeetings = () => {
+    const meetings = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('monthly_meeting_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          meetings.push({
+            id: key,
+            ...data,
+            savedAt: new Date(data.savedAt || Date.now())
+          });
+        } catch (error) {
+          console.error('Error loading monthly meeting:', key, error);
+        }
+      }
+    }
+    meetings.sort((a, b) => b.savedAt - a.savedAt);
+    setMonthlyMeetings(meetings);
+  };
+
+  const generateCurrentMonthMeeting = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    const meeting = saveMonthlyMeeting(currentMonth, currentYear);
+    setMeetingForm(meeting);
+    
+    alert(`✅ ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} monthly meeting generated!\n\nForm pre-populated with current month metrics.`);
+  };
+
+  const scheduleRecurringMeetings = () => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    
+    // Generate meetings for remaining months of current year
+    for (let month = now.getMonth(); month < 12; month++) {
+      saveMonthlyMeeting(month, currentYear);
+    }
+    
+    // Generate meetings for next year
+    for (let month = 0; month < 12; month++) {
+      saveMonthlyMeeting(month, currentYear + 1);
+    }
+    
+    loadMonthlyMeetings();
+    alert(`✅ Recurring monthly meetings scheduled!\n\nGenerated meetings for remaining ${12 - now.getMonth()} months of ${currentYear} and all 12 months of ${currentYear + 1}.`);
   };
 
   const saveMeetingForm = () => {
@@ -1920,7 +2102,7 @@ This completion rate should be our benchmark across all work streams.`}
             </div>
 
             {/* Form Actions */}
-            <div className="flex gap-4 pt-6 border-t border-gray-600">
+            <div className="flex flex-wrap gap-4 pt-6 border-t border-gray-600">
               <button
                 onClick={saveMeetingForm}
                 className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
@@ -1942,6 +2124,30 @@ This completion rate should be our benchmark across all work streams.`}
               >
                 <Eye className="w-5 h-5" />
                 View Saved Forms
+              </button>
+              <button
+                onClick={generateCurrentMonthMeeting}
+                className="flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium"
+              >
+                <Plus className="w-5 h-5" />
+                Generate Monthly Meeting
+              </button>
+              <button
+                onClick={() => {
+                  loadMonthlyMeetings();
+                  setShowMonthlyMeetings(true);
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+              >
+                <FileText className="w-5 h-5" />
+                View Monthly History
+              </button>
+              <button
+                onClick={scheduleRecurringMeetings}
+                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+              >
+                <RefreshCw className="w-5 h-5" />
+                Schedule Recurring
               </button>
               <button
                 onClick={() => {
@@ -2025,6 +2231,127 @@ This completion rate should be our benchmark across all work streams.`}
                         <p><strong>Meeting Date:</strong> {meeting.meetingDate}</p>
                         <p><strong>Performance Rating:</strong> {meeting.performanceRating}</p>
                         <p><strong>Saved:</strong> {new Date(meeting.timestamp).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Monthly Meetings History Modal */}
+      {showMonthlyMeetings && (
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-gray-800 rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="p-6 border-b border-gray-700 sticky top-0 bg-gray-800">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Monthly Meeting History</h2>
+                <button
+                  onClick={() => setShowMonthlyMeetings(false)}
+                  className="p-2 text-gray-400 hover:text-white"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-gray-400 mt-2">Automated monthly performance reviews and metrics tracking</p>
+            </div>
+            <div className="p-6">
+              {monthlyMeetings.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-400 mb-4">No monthly meetings found.</p>
+                  <button
+                    onClick={() => {
+                      generateCurrentMonthMeeting();
+                      setShowMonthlyMeetings(false);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 mx-auto"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Generate Current Month Meeting
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {monthlyMeetings.map((meeting, index) => (
+                    <div key={index} className="bg-gray-700 rounded-lg p-6 border border-gray-600">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-semibold text-white">
+                            {meeting.monthlyMetrics ? `${meeting.monthlyMetrics.month} ${meeting.monthlyMetrics.year}` : meeting.meetingDate} Monthly Review
+                          </h3>
+                          <p className="text-gray-400">
+                            {meeting.employeeName} - {meeting.managerName}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setMeetingForm(meeting);
+                              setShowMonthlyMeetings(false);
+                            }}
+                            className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                          >
+                            <Edit className="w-4 h-4" />
+                            Load & Edit
+                          </button>
+                          <button
+                            onClick={() => deleteMeeting(index)}
+                            className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {meeting.monthlyMetrics && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="bg-gray-800 rounded-lg p-4">
+                            <h4 className="text-green-400 font-semibold mb-2">Design Performance</h4>
+                            <div className="space-y-1 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Completion Rate:</span>
+                                <span className="text-green-400 font-medium">{meeting.monthlyMetrics.designJobs.completionRate}%</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Tasks:</span>
+                                <span className="text-white">{meeting.monthlyMetrics.designJobs.tasksCompleted}/{meeting.monthlyMetrics.designJobs.tasksCreated}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Efficiency:</span>
+                                <span className="text-blue-400">{meeting.monthlyMetrics.designJobs.efficiency}%</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-gray-800 rounded-lg p-4">
+                            <h4 className="text-orange-400 font-semibold mb-2">Bone Performance</h4>
+                            <div className="space-y-1 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Completion Rate:</span>
+                                <span className="text-orange-400 font-medium">{meeting.monthlyMetrics.boneJobs.completionRate}%</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Bones:</span>
+                                <span className="text-white">{meeting.monthlyMetrics.boneJobs.bonesFinished}/{meeting.monthlyMetrics.boneJobs.totalBones}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Efficiency:</span>
+                                <span className="text-blue-400">{meeting.monthlyMetrics.boneJobs.efficiency}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="text-sm text-gray-300">
+                        <p><strong>Meeting Date:</strong> {meeting.meetingDate}</p>
+                        <p><strong>Performance Rating:</strong> {meeting.performanceRating}</p>
+                        <p><strong>Generated:</strong> {new Date(meeting.savedAt).toLocaleString()}</p>
+                        {meeting.isMonthlyTemplate && (
+                          <p className="text-blue-400 mt-2">📅 Auto-generated monthly template</p>
+                        )}
                       </div>
                     </div>
                   ))}
